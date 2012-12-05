@@ -1,0 +1,33 @@
+apply plugin: 'scala'
+apply plugin: 'idea'
+
+repositories {
+    mavenCentral()
+    maven {
+	url 'https://oss.sonatype.org/content/groups/scala-tools/'
+    }
+}
+
+def SCALA_VERSION='2.9.1'
+dependencies {
+    // Scala compiler and related tools
+    scalaTools "org.scala-lang:scala-compiler:scala-$SCALA_VERSION"
+
+    // Scala standard library
+    compile (["org.scala-lang:scala-library:$SCALA_VERSION",
+              "com.mongodb.casbah:casbah_2.9.1:2.1.5-1",
+    ])
+    testCompile (['org.scalatest:scalatest_2.9.1:2.0.M6-SNAP2'])
+
+}
+
+compileScala {
+    scalaCompileOptions.useCompileDaemon = true
+
+    // optionally specify host and port of the daemon:
+    scalaCompileOptions.daemonServer = "localhost:4243"
+}
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.useAnt = false
+}
