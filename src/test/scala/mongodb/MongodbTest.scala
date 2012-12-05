@@ -14,10 +14,11 @@ class MongodbTest extends FunSuite with BeforeAndAfter {
     RegisterJodaTimeConversionHelpers()
     mongoConn(databaseName).dropDatabase()
     insertCity("Punxsutawney", 6200, new DateTime("2008-01-31"), List("phil the groundhog"), Map("name" -> "Jim Wehrle") )
+    insertCity("Portland", 582000, new DateTime("2007-09-20"), List("beer", "food"), Map("name" -> "Sam Adams", "party" -> "D") )
   }
 
   test("querying from a Mongo collection") {
-    assert(mongoConn(databaseName)(collectionName).findOne().size > 0)
+    assert(mongoConn(databaseName)(collectionName).find().size === 2)
   }
 
   def insertCity( name: String, population: Int, last_census: DateTime, famous_for: List[String], mayor_info: Map[String,String] ) {
