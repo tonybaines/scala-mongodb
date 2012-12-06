@@ -1,6 +1,19 @@
 apply plugin: 'scala'
 apply plugin: 'idea'
 
+buildscript {
+  repositories{
+    maven{
+      url "https://raw.github.com/rodionmoiseev/maven-repo/master/repo/releases"
+    }
+  }
+  dependencies {
+    classpath group: 'org.rodion.gradle', name: 'idea-scala-plugin', version: '0.2'
+  }
+}
+
+apply plugin: 'idea-scala'
+
 repositories {
     mavenCentral()
     maven {
@@ -10,8 +23,10 @@ repositories {
 
 def SCALA_VERSION='2.9.1'
 dependencies {
+    scalaApi "org.scala-lang:scala-library:$SCALA_VERSION"
+
     // Scala compiler and related tools
-    scalaTools "org.scala-lang:scala-compiler:scala-$SCALA_VERSION"
+    scalaTools "org.scala-lang:scala-compiler:$SCALA_VERSION"
 
     // Scala standard library
     compile (["org.scala-lang:scala-library:$SCALA_VERSION",
