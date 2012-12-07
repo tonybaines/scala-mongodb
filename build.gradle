@@ -14,10 +14,18 @@ buildscript {
 
 apply plugin: 'idea-scala'
 
+ideaScala{
+    compiler {
+        fsc {
+            enable = true
+        }
+    }
+}
+
 repositories {
     mavenCentral()
     maven {
-	url 'https://oss.sonatype.org/content/groups/scala-tools/'
+	    url 'https://oss.sonatype.org/content/groups/scala-tools/'
     }
 }
 
@@ -25,10 +33,8 @@ def SCALA_VERSION='2.9.1'
 dependencies {
     scalaApi "org.scala-lang:scala-library:$SCALA_VERSION"
 
-    // Scala compiler and related tools
     scalaTools "org.scala-lang:scala-compiler:$SCALA_VERSION"
 
-    // Scala standard library
     compile (["org.scala-lang:scala-library:$SCALA_VERSION",
               "com.mongodb.casbah:casbah_2.9.1:2.1.5-1",
     ])
@@ -38,11 +44,12 @@ dependencies {
 
 compileScala {
     scalaCompileOptions.useCompileDaemon = true
-
-    // optionally specify host and port of the daemon:
-    scalaCompileOptions.daemonServer = "localhost:4243"
 }
 
 tasks.withType(ScalaCompile) {
     scalaCompileOptions.useAnt = false
+    configure(scalaCompileOptions.forkOptions) {
+        memoryMaximumSize = '1g'
+        jvmArgs = ['-XX:MaxPermSize=512m']
+    }
 }
