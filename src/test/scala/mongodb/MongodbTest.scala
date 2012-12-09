@@ -1,10 +1,12 @@
 package mongodb
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import com.mongodb.casbah.Imports._
+import com.mongodb.casbah.commons.{MongoDBObject => MO, MongoDBList}
 import com.mongodb.casbah.query.Implicits._
 import org.joda.time.DateTime
 import com.mongodb.casbah.commons.conversions.scala.RegisterJodaTimeConversionHelpers
+import com.mongodb.casbah.MongoConnection
+import com.mongodb.DBObject
 
 class MongodbTest extends FunSuite with BeforeAndAfter {
   val mongoConn = MongoConnection()
@@ -20,27 +22,30 @@ class MongodbTest extends FunSuite with BeforeAndAfter {
   }
 
   test("querying from a Mongo collection") {
-    assert(mongoConn(databaseName)(collectionName).find().size === 3)
+    assert(theCollection.find().size === 3)
   }
 
   test("querying using a regular expression") {
-    val query = MongoDBObject("name" -> "(?i)new".r)
-    val result = mongoConn(databaseName)(collectionName).findOne(query).head
+    val query = MO("name" -> "(?i)new".r)
+    val result = theCollection.findOne(query).head
     assert(result("name") === "New York")
     println(result)
   }
 
   test("cities with an e in their name, famous for food or beer.") {
-    val eInTheName = MongoDBObject("name" -> "(?i)e".r)
+    val eInTheName = MO("name" -> "(?i)e".r)
     val famousForFoodOrBeer = "famous_for" $in List("food", "beer")
 
-    assert(mongoConn(databaseName)(collectionName).find(eInTheName).size === 2)
-    assert(mongoConn(databaseName)(collectionName).find(famousForFoodOrBeer).size === 2)
-    assert(mongoConn(databaseName)(collectionName).find(eInTheName ++ famousForFoodOrBeer).size === 1)
+    assert(theCollection.find(eInTheName).size === 2)
+    assert(theCollection.find(famousForFoodOrBeer).size === 2)
+    assert(theCollection.find(eInTheName ++ famousForFoodOrBeer).size === 1)
   }
 
+
+  def theCollection = mongoConn(databaseName)(collectionName)
+
   def insertCity(name: String, population: Int, last_census: DateTime, famous_for: List[String], mayor_info: DBObject) {
-    mongoConn(databaseName)(collectionName) += MongoDBObject(
+    theCollection += MO(
       "name" -> name,
       "population" -> population,
       "last_census" -> last_census,
